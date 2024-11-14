@@ -1,0 +1,29 @@
+{
+  "name": "desmoscalculator",
+  "version": "1.0.0",
+  "description": "A convenient popup window using desmos's calculator interface",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "build": {
+    "appId": "nyc.samb.DesmosCalculator",
+    "productName": "Desmos Calculator",
+    "directories": {
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*"
+    ],
+    "mac": {
+      "icon": "build/icon.icns"
+    }
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "author": "Sam Belliveau",
+  "license": "ISC"
+}
