@@ -1,6 +1,6 @@
 // main.js
 
-const { app, BrowserWindow, Tray, Menu, globalShortcut } = require("electron");
+const { app, BrowserWindow, Tray, Menu, globalShortcut, nativeImage } = require("electron");
 const path = require("path");
 
 let showHideKey;
@@ -15,6 +15,8 @@ if (!gotTheLock) {
   // If another instance is running, quit this one
   app.quit();
 } else {  
+  app.disableHardwareAcceleration();
+
   // This is the primary instance
   app.on('second-instance', (event, argv, workingDirectory) => {
     // Someone tried to run a second instance, focus the window if necessary
@@ -34,12 +36,10 @@ if (!gotTheLock) {
       frame: false,
       skipTaskbar: true,
       resizable: false,
-      transparent: true,
       alwaysOnTop: true,
       fullscreenable: false,
       webPreferences: {
-        contextIsolation: true,
-        nodeIntegration: false,
+        backgroundThrottling: true,
       },
     });
 
@@ -61,11 +61,14 @@ if (!gotTheLock) {
         mainWindow.hide();
       }
     });
+
+    mainWindow.webContents.setFrameRate(30)
   }
 
   function createTray() {
     // Create a tray icon
-    tray = new Tray(path.join(__dirname, "desmos", "iconTemplate@4x.png")); // Use a transparent PNG for macOS
+    icon = nativeImage.createFromPath(path.join(__dirname, "desmos", "iconTemplate@4x.png"));
+    tray = new Tray(icon);
 
     // Optional: Add a context menu to the tray icon
     const contextMenu = Menu.buildFromTemplate([
@@ -97,19 +100,18 @@ if (!gotTheLock) {
     ]);
 
     tray.setContextMenu(contextMenu);
-
-    // Show the window when the tray icon is clicked
-    tray.on("click", () => {
-      toggleWindow();
-    });
   }
 
   function toggleWindow() {
     if (mainWindow.isVisible()) {
-      mainWindow.hide();
+      hideWindow();
     } else {
       showWindow();
     }
+  }
+
+  function hideWindow() {
+    mainWindow.hide();
   }
 
   function showWindow() {
@@ -137,26 +139,13 @@ if (!gotTheLock) {
     createWindow();
     createTray();
 
-    // Register the global shortcut
-    const toggle = globalShortcut.register(showHideKey, () => {
+    globalShortcut.register(showHideKey, () => {
       toggleWindow();
     });
 
-    const escape = globalShortcut.register("Escape", () => {
+    globalShortcut.register("Escape", () => {
       mainWindow.hide();
     });
-
-    if (toggle) {
-      console.log("Toggle Register Succeeded!");
-    } else {
-      console.log("Toggle Register Failed!");
-    }
-
-    if (escape) {
-      console.log("Escape Register Succeeded!");
-    } else {
-      console.log("Escape Register Failed!");
-    }
   });
 
   // Clean up on exit
