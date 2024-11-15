@@ -10,6 +10,8 @@ const {
 } = require("electron");
 const path = require("path");
 
+const settings = require("electron-settings");
+
 let showHideKey;
 
 let mainWindow;
@@ -57,8 +59,14 @@ if (!gotTheLock) {
     mainWindow.setAlwaysOnTop(true, "floating", 1);
     mainWindow.webContents.setFrameRate(30);
 
+    if (!settings.hasSync("hideOnFocusLoss")) {
+      settings.setSync("hideOnFocusLoss", true);
+    }
+
     mainWindow.on("blur", () => {
-      hideWindow();
+      if (settings.getSync("hideOnFocusLoss")) {
+        hideWindow();
+      }
     });
   }
 
@@ -102,6 +110,14 @@ if (!gotTheLock) {
         accelerator: showHideKey,
         click: () => {
           toggleWindow();
+        },
+      },
+      {
+        label: "Hide on Focus Loss",
+        type: "checkbox",
+        checked: settings.getSync("hideOnFocusLoss"),
+        click: (menuItem) => {
+          settings.setSync("hideOnFocusLoss", menuItem.checked);
         },
       },
       {
