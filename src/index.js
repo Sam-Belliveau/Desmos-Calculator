@@ -1,6 +1,13 @@
 // main.js
 
-const { app, BrowserWindow, Tray, Menu, globalShortcut, nativeImage } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  Tray,
+  Menu,
+  globalShortcut,
+  nativeImage,
+} = require("electron");
 const path = require("path");
 
 let showHideKey;
@@ -14,11 +21,11 @@ const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   // If another instance is running, quit this one
   app.quit();
-} else {  
+} else {
   app.disableHardwareAcceleration();
 
   // This is the primary instance
-  app.on('second-instance', (event, argv, workingDirectory) => {
+  app.on("second-instance", (event, argv, workingDirectory) => {
     // Someone tried to run a second instance, focus the window if necessary
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();
@@ -26,7 +33,7 @@ if (!gotTheLock) {
       mainWindow.focus();
     }
   });
-  
+
   function createWindow() {
     // Create the browser window but don't show it immediately
     mainWindow = new BrowserWindow({
@@ -43,34 +50,52 @@ if (!gotTheLock) {
       },
     });
 
-    // Set the global shortcut key
     showHideKey = "Command+Shift+D";
 
-    // Load your index.html file
     mainWindow.loadFile("src/index.html");
-
-    // Make the window appear over full-screen apps
     mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
-
-    // Optional: Adjust window level to floating
     mainWindow.setAlwaysOnTop(true, "floating", 1);
+    mainWindow.webContents.setFrameRate(30);
 
-    // Hide the window when it loses focus
     mainWindow.on("blur", () => {
-      if (!mainWindow.webContents.isDevToolsOpened()) {
-        mainWindow.hide();
-      }
+      hideWindow();
     });
+  }
 
-    mainWindow.webContents.setFrameRate(30)
+  function toggleWindow() {
+    if (mainWindow.isVisible()) {
+      hideWindow();
+    } else {
+      showWindow();
+    }
+  }
+
+  function hideWindow() {
+    mainWindow.hide();
+  }
+
+  function showWindow() {
+    // Position the window near the tray icon
+    const trayBounds = tray.getBounds();
+    const windowBounds = mainWindow.getBounds();
+
+    // Calculate the position (for simplicity, we'll center it horizontally)
+    const x = Math.round(
+      trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2
+    );
+    const y = trayBounds.y + trayBounds.height + 4;
+
+    mainWindow.setPosition(x, y, false);
+    mainWindow.show();
+    mainWindow.focus();
   }
 
   function createTray() {
-    // Create a tray icon
-    icon = nativeImage.createFromPath(path.join(__dirname, "desmos", "iconTemplate@4x.png"));
+    icon = nativeImage.createFromPath(
+      path.join(__dirname, "desmos", "iconTemplate@4x.png")
+    );
     tray = new Tray(icon);
 
-    // Optional: Add a context menu to the tray icon
     const contextMenu = Menu.buildFromTemplate([
       {
         label: "Show/Hide",
@@ -102,36 +127,7 @@ if (!gotTheLock) {
     tray.setContextMenu(contextMenu);
   }
 
-  function toggleWindow() {
-    if (mainWindow.isVisible()) {
-      hideWindow();
-    } else {
-      showWindow();
-    }
-  }
-
-  function hideWindow() {
-    mainWindow.hide();
-  }
-
-  function showWindow() {
-    // Position the window near the tray icon
-    const trayBounds = tray.getBounds();
-    const windowBounds = mainWindow.getBounds();
-
-    // Calculate the position (for simplicity, we'll center it horizontally)
-    const x = Math.round(
-      trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2
-    );
-    const y = trayBounds.y + trayBounds.height + 4;
-
-    mainWindow.setPosition(x, y, false);
-    mainWindow.show();
-    mainWindow.focus();
-  }
-
   app.whenReady().then(() => {
-    // Hide the dock icon
     if (app.dock && app.dock.hide) {
       app.dock.hide();
     }
@@ -144,17 +140,15 @@ if (!gotTheLock) {
     });
 
     globalShortcut.register("Escape", () => {
-      mainWindow.hide();
+      hideWindow();
     });
   });
 
-  // Clean up on exit
   app.on("will-quit", () => {
     globalShortcut.unregisterAll();
   });
 
   app.on("window-all-closed", (e) => {
-    // Prevent the app from quitting when all windows are closed
     e.preventDefault();
   });
 }
