@@ -11,11 +11,6 @@ const {
 const path = require("path");
 const settings = require("electron-settings");
 
-app.disableHardwareAcceleration();
-if (!app.requestSingleInstanceLock()) {
-  app.quit();
-}
-
 let showHideKey = "CommandOrControl+Shift+D";
 
 function getSetting(key, defaultValue) {
@@ -36,6 +31,11 @@ class MainApp {
     this._mainWindow = null;
     this.tray = null;
 
+    if (!app.requestSingleInstanceLock()) {
+      app.quit();
+      return;
+    }
+
     app.on("second-instance", () => this.showWindow());
 
     app.on("will-quit", () => globalShortcut.unregisterAll());
@@ -43,6 +43,7 @@ class MainApp {
 
     app.on("close", () => (this._mainWindow = null));
 
+    app.disableHardwareAcceleration();
     app.whenReady().then(() => {
       if (app.dock && app.dock.hide) {
         app.dock.hide();
