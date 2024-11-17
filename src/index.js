@@ -98,6 +98,13 @@ class MainApp {
           this.hideWindow();
         }
       });
+
+      this._mainWindow.webContents.on("before-input-event", (event, input) => {
+        if (input.key === "Escape") {
+          this.hideWindow();
+          event.preventDefault();
+        }
+      });
     }
 
     return this._mainWindow;
@@ -159,7 +166,6 @@ class MainApp {
 
   registerShortcuts() {
     globalShortcut.register(showHideKey, () => this.toggleWindow());
-    globalShortcut.register("Escape", () => this.hideWindow());
   }
 
   toggleWindow() {
