@@ -1,6 +1,5 @@
 /* styles.css */
 
-/* Ensure the html and body elements take up the full height */
 html,
 body {
   margin: 0;
@@ -8,8 +7,11 @@ body {
   height: 100%;
 }
 
-/* Make the calculator div fill the available space */
 #calculator {
   width: 100%;
   height: 100%;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
