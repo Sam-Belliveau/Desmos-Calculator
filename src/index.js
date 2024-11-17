@@ -36,7 +36,7 @@ class MainApp {
     this._mainWindow = null;
     this.tray = null;
 
-    app.on("second-instance", () => this.focusWindow());
+    app.on("second-instance", () => this.showWindow());
 
     app.on("will-quit", () => globalShortcut.unregisterAll());
     app.on("window-all-closed", (e) => e.preventDefault());
@@ -144,8 +144,8 @@ class MainApp {
                 path: app.getPath("exe"),
                 args: [],
               }),
-          }
-        ]
+          },
+        ],
       },
       {
         label: "Quit",
@@ -184,12 +184,6 @@ class MainApp {
 
     this.mainWindow.setPosition(x, y, false);
     this.mainWindow.show();
-    this.mainWindow.focus();
-  }
-
-  focusWindow() {
-    if (this.mainWindow.isMinimized()) this.mainWindow.restore();
-    if (!this.mainWindow.isVisible()) this.mainWindow.show();
     this.mainWindow.focus();
   }
 
