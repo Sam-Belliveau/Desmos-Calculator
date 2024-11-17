@@ -36,7 +36,7 @@ class MainApp {
     this._mainWindow = null;
     this.tray = null;
 
-    app.on("second-instance", () => this.focusMainWindow());
+    app.on("second-instance", () => this.focusWindow());
 
     app.on("will-quit", () => globalShortcut.unregisterAll());
     app.on("window-all-closed", (e) => e.preventDefault());
@@ -187,7 +187,7 @@ class MainApp {
     this.mainWindow.focus();
   }
 
-  focus() {
+  focusWindow() {
     if (this.mainWindow.isMinimized()) this.mainWindow.restore();
     if (!this.mainWindow.isVisible()) this.mainWindow.show();
     this.mainWindow.focus();
