@@ -31,7 +31,7 @@
     />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="desmos/calculator.js"></script>
-    <title>Desmos Scientific Calculator</title>
+    <title>Desmos Graphing Calculator</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -39,6 +39,7 @@
     <script>
       var elt = document.getElementById("calculator");
       var calculator = Desmos.Calculator(elt);
+      calculator.unobserveEvent('change');
       calculator.focusFirstExpression();
     </script>
   </body>
