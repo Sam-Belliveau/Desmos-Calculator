@@ -39,8 +39,18 @@
     <script>
       var elt = document.getElementById("calculator");
       var calculator = Desmos.ScientificCalculator(elt);
-      calculator.unobserveEvent('change');
+      calculator.unobserveEvent("change");
       calculator.focusFirstExpression();
+
+      window.electronAPI.onNewBlankExpression((data) => {
+        calculator.controller.dispatch({
+          type: "focus-last-expression",
+        });
+
+        calculator.controller.dispatch({
+          type: "insert-blank-expression",
+        });
+      });
     </script>
   </body>
 </html>

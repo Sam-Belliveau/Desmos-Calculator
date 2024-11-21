@@ -77,7 +77,9 @@ class MainApp {
         alwaysOnTop: true,
         fullscreenable: false,
         webPreferences: {
+          contextIsolation: true,
           backgroundThrottling: true,
+          preload: path.join(__dirname, "preload.js"),
         },
       });
 
@@ -168,6 +170,10 @@ class MainApp {
     globalShortcut.register(showHideKey, () => this.toggleWindow());
   }
 
+  newBlankExpression() {
+    this.mainWindow.webContents.send("new-blank-expression");
+  }
+
   toggleWindow() {
     if (this.mainWindow.isVisible()) {
       this.hideWindow();
@@ -192,13 +198,13 @@ class MainApp {
     this.mainWindow.setPosition(x, y, false);
     this.mainWindow.show();
     this.mainWindow.focus();
+    this.newBlankExpression();
   }
 
   reloadWindow() {
-    this.hideWindow();
     this.mainWindow.destroy();
     this._mainWindow = null;
-    this.mainWindow;
+    this.showWindow();
   }
 }
 

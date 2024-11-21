@@ -39,8 +39,26 @@
     <script>
       var elt = document.getElementById("calculator");
       var calculator = Desmos.Calculator(elt);
-      calculator.unobserveEvent('change');
+      calculator.unobserveEvent("change");
       calculator.focusFirstExpression();
+
+      window.electronAPI.onNewBlankExpression((data) => {
+        let time = Math.round(window.performance.now());
+        let expression = `new-blank-expression-${time}`;
+
+        calculator.setExpression({
+          id: expression,
+          type: "expression",
+          latex: "",
+        });
+
+        calculator.withControllerInAPIMode(() => {
+          calculator.controller.dispatch({
+            type: "move-focus-to-item",
+            id: expression,
+          });
+        });
+      });
     </script>
   </body>
 </html>
